@@ -121,7 +121,7 @@
 <body>
 
     <div class="container">
-        <div class="logo">LEGEND PANEL</div>
+        <div class="logo">ADMIN PANEL</div>
         
         <div class="input-group">
             <label>تێلێگرام ID یا بەکارهێنەری:</label>
@@ -141,7 +141,7 @@
             <input type="number" id="keyAmount" placeholder="بۆ نموونە: 10">
         </div>
 
-        <button class="btn" onclick="addBalanceToUser()">زێدەکرنا باڵانسی</button>
+        <button class="btn" onclick="sendBalanceNotification()">هنارتنا کلیلان بۆ ئەندامی</button>
         <div id="alertMsg" class="alert"></div>
     </div>
 
@@ -188,7 +188,7 @@
             }
         }
 
-        async function addBalanceToUser() {
+        async function sendBalanceNotification() {
             const userId = document.getElementById('userId').value.trim();
             const amount = parseInt(document.getElementById('keyAmount').value);
             const alertMsg = document.getElementById('alertMsg');
@@ -205,24 +205,21 @@
             alertMsg.innerText = "⏳ ل هافێن هنارتنێ... چاڤەڕێ بە.";
 
             try {
-                // لێرە لینکا سێرڤەرێ خوە (یا Railway) دانە
-                let response = await fetch('https://لێرە-لینکا-سێرڤەرا-خوە-دانە.up.railway.app/api/add_balance', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, amount: amount })
-                });
-                
-                let result = await response.json();
-                if (result.status === "success") {
+                // ڤێجا لێرە ماڵپەڕ ڕاستەوخۆ پیامەکێ ب ڕێکا بۆت بۆ ئەندامی د هنێریت داکو پێزانین هەبن
+                let msg = `🎉 پیرۆزە! ${amount} کلیل ژ لایێ ڕێڤەبەری ڤە هاتنە زێدەکرن بۆ پڕۆفایلا تە.`;
+                let res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${userId}&text=${encodeURIComponent(msg)}`);
+                let data = await res.json();
+
+                if (data.ok) {
                     alertMsg.style.color = '#00ffcc';
-                    alertMsg.innerText = `🎉 ب سەرکەفتن! ${amount} کلیل زێدەبوون. باڵانسا نوو: ${result.new_balance}`;
+                    alertMsg.innerText = `🎉 ب سەرکەفتن! ${amount} کلیل بۆ ئەندام (` + userId + `) هاتە هنارتن و پەیام گەهشتێ.`;
                 } else {
                     alertMsg.style.color = '#ff4d4d';
-                    alertMsg.innerText = "⚠️ خەلەتیەک هشک بوتە!";
+                    alertMsg.innerText = "⚠️ خەلەتی! ئەندامی هێشتا بۆت نەڤەکریە.";
                 }
             } catch (error) {
                 alertMsg.style.color = '#ff4d4d';
-                alertMsg.innerText = "⚠️ پەیوەندی ب سێرڤەری نەکەت! لینکا سێرڤەری پشکنە.";
+                alertMsg.innerText = "⚠️ پەیوەندی نەکەت ب سێرڤەرا تەلەگرام.";
             }
         }
     </script>
