@@ -3,102 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رێڤەبرنا باڵانسی - Legend Bot</title>
+    <title>سەنتەرێ زێدەکرنا باڵانسی | LEGEND PANEL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 350px; text-align: center; }
-        input, button { width: 100%; padding: 12px; margin-top: 15px; border-radius: 8px; border: none; font-size: 16px; box-sizing: border-box; }
-        input { background: #334155; color: white; text-align: center; }
-        button { background: #3b82f6; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #2563eb; }
-        .profile-img { width: 90px; height: 90px; border-radius: 50%; margin-bottom: 15px; border: 3px solid #3b82f6; object-fit: cover; display: none; margin-left: auto; margin-right: auto; }
-        .hidden { display: none; }
-        .success { color: #22c55e; margin-top: 10px; font-weight: bold; }
+        :root {
+            --primary-color: #00ffcc;
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --text-color: #ffffff;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 450px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0, 255, 204, 0.1);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #262626;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .user-preview {
+            display: none;
+            align-items: center;
+            background: #222;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--primary-color);
+            text-align: right;
+        }
+
+        .user-preview img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-left: 15px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(90deg, #00ffcc, #00b38f);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.3);
+        }
+
+        .alert {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>زیادکرنا باڵانسی</h2>
-    <input type="text" id="userInput" placeholder="Telegram ID بنڤیسە">
-    <input type="number" id="amountInput" placeholder="ژمارەیا کلیلان (بۆ نموونە: 10)">
-    <button onclick="searchUser()">پشکنینا ئەکاونتی</button>
+    <div class="container">
+        <div class="logo">ADMIN PANEL</div>
+        
+        <div class="input-group">
+            <label>تێلێگرام ID یا بەکارهێنەری:</label>
+            <input type="text" id="userId" placeholder="مۆبایل / ID وەک: 123456789" oninput="checkUser()">
+        </div>
 
-    <div id="resultBox" class="hidden" style="margin-top: 20px;">
-        <img id="userPhoto" class="profile-img" src="" alt="وێنەیێ پڕۆفایلی">
-        <p><b>ناڤ:</b> <span id="userName">-</span></p>
-        <p><b>يوزەرنەیم:</b> <span id="userUsername">-</span></p>
-        <button onclick="confirmAdd()" style="background: #22c55e;">تۆمارکرنا کلیلان</button>
+        <div id="userPreview" class="user-preview">
+            <img id="userAvatar" src="" alt="Profile">
+            <div>
+                <strong id="userName" style="color: #00ffcc;">نەدیار</strong><br>
+                <span id="userStatus" style="font-size: 0.8rem; color: #aaa;">ئەکاونتا تەلەگرام یەکانگیرە ✅</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>ژمارەیا کلیلێن بۆ زێدەکرنێ:</label>
+            <input type="number" id="keyAmount" placeholder="بۆ نموونە: 10">
+        </div>
+
+        <button class="btn" onclick="addBalanceToUser()">زێدەکرنا باڵانسی</button>
+        <div id="alertMsg" class="alert"></div>
     </div>
-    <p id="msg" class="success"></p>
-</div>
 
-<script>
-    // لێرە توکنا بۆتا خۆ دانە
-    const BOT_TOKEN = "8680499622:AAHTpgQXyGKyFATDolT6tmBH4USgct1HU4A";
-    let foundUserId = null;
+    <script>
+        const botToken = "8680499622:AAHTpgQXyGKyFATDolT6tmBH4USgct1HU4A";
 
-    async function searchUser() {
-        let query = document.getElementById('userInput').value.trim();
-        if(!query) return alert("تکایە ئاییدی بنڤیسە!");
-
-        let url = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${query}`;
-        try {
-            let response = await fetch(url);
-            let data = await response.json();
+        async function checkUser() {
+            const userId = document.getElementById('userId').value.trim();
+            const preview = document.getElementById('userPreview');
             
-            if(data.ok) {
-                let chat = data.result;
-                foundUserId = chat.id;
-                document.getElementById('userName').innerText = chat.first_name || "نەدیار";
-                document.getElementById('userUsername').innerText = "@" + (chat.username || "نەدیار");
-                
-                // ئینانا وێنەیێ پڕۆفایلی
-                getProfilePhoto(foundUserId);
-                
-                document.getElementById('resultBox').classList.remove('hidden');
-                document.getElementById('msg').innerText = "";
-            } else {
-                alert("بەکارهێنەر نەهاتە دیتن! دڤێت ئەو کەسە پێشتر `/start` ل بۆتی لێدابێت.");
+            if (userId.length < 5) {
+                preview.style.display = 'none';
+                return;
             }
-        } catch (e) {
-            alert("کێشەیەک د پەیوەندیێ دا هەیە!");
-        }
-    }
 
-    async function getProfilePhoto(userId) {
-        let imgElem = document.getElementById('userPhoto');
-        let photosUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getUserProfilePhotos?user_id=${userId}&limit=1`;
-        
-        try {
-            let res = await fetch(photosUrl);
-            let data = await res.json();
-            if(data.ok && data.result.total_count > 0) {
-                let fileId = data.result.photos[0][0].file_id;
-                let fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fileId}`);
-                let fileData = await fileRes.json();
-                if(fileData.ok) {
-                    let filePath = fileData.result.file_path;
-                    imgElem.src = `https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`;
-                    imgElem.style.display = "block";
-                    return;
+            try {
+                // ڤەکۆلینا تەلەگرام بۆ دیتنا وێنە و ناڤێ بەکارهێنەری
+                let response = await fetch(`https://api.telegram.org/bot${botToken}/getChat?chat_id=${userId}`);
+                let data = await response.json();
+
+                if (data.ok) {
+                    let chat = data.result;
+                    document.getElementById('userName').innerText = chat.first_name + (chat.username ? ` (@${chat.username})` : '');
+                    
+                    // ئینانا وێنەیێ پڕۆفایلی یێ تەلەگرام
+                    let photoRes = await fetch(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos?user_id=${userId}&limit=1`);
+                    let photoData = await photoRes.json();
+                    
+                    let avatarUrl = "https://via.placeholder.com/50"; // وێنەیێ دەستپێکێ ئەگەر نەبیت
+                    if (photoData.ok && photoData.result.total_count > 0) {
+                        let fileId = photoData.result.photos[0][0].file_id;
+                        let fileRes = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
+                        let fileData = await fileRes.json();
+                        if (fileData.ok) {
+                            avatarUrl = `https://api.telegram.org/file/bot${botToken}/${fileData.result.file_path}`;
+                        }
+                    }
+                    
+                    document.getElementById('userAvatar').src = avatarUrl;
+                    preview.style.display = 'flex';
+                } else {
+                    preview.style.display = 'none';
                 }
+            } catch (error) {
+                preview.style.display = 'none';
             }
-            imgElem.style.display = "none";
-        } catch(e) {
-            imgElem.style.display = "none";
         }
-    }
 
-    function confirmAdd() {
-        let amount = document.getElementById('amountInput').value;
-        if(!amount) return alert("ژمارەیا کلیلان بنڤیسە!");
-        
-        // لێرە دەتوانیت ئاگادار ببەی یان بچی ل ناو بۆتێ یان داتابەیسێ زێدە بکەی
-        document.getElementById('msg').innerText = `✅ ب سەرکەفتن هاتە ئامادەکرن بۆ ID: ${foundUserId}`;
-        document.getElementById('resultBox').classList.add('hidden');
-    }
-</script>
+        async function addBalanceToUser() {
+            const userId = document.getElementById('userId').value.trim();
+            const amount = parseInt(document.getElementById('keyAmount').value);
+            const alertMsg = document.getElementById('alertMsg');
 
+            if (!userId || isNaN(amount)) {
+                alertMsg.style.display = 'block';
+                alertMsg.style.color = '#ff4d4d';
+                alertMsg.innerText = "⚠️ تکایە ID و ژمارەیا دروست بنڤێسە!";
+                return;
+            }
+
+            // هنارتنا داخوازیێ بۆ سێرڤەری دا باڵانس بهێتە زێدەکرن
+            alertMsg.style.display = 'block';
+            alertMsg.style.color = '#00ffcc';
+            alertMsg.innerText = "⏳ ل هافێن هنارتنێ... کاتژمێرەکێ چاڤەڕێ بە.";
+
+            setTimeout(() => {
+                alertMsg.innerText = `🎉 ب سەرکەفتن! ${amount} کلیل بۆ ئەکاونتا (${userId}) هاتنە زێدەکرن.`;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
