@@ -121,18 +121,18 @@
 <body>
 
     <div class="container">
-        <div class="logo">ADMIN PANEL</div>
+        <div class="logo">LEGEND PANEL</div>
         
         <div class="input-group">
             <label>تێلێگرام ID یا بەکارهێنەری:</label>
-            <input type="text" id="userId" placeholder="مۆبایل / ID وەک: 123456789" oninput="checkUser()">
+            <input type="text" id="userId" placeholder="نموونە: 123456789" oninput="checkUser()">
         </div>
 
         <div id="userPreview" class="user-preview">
             <img id="userAvatar" src="" alt="Profile">
             <div>
                 <strong id="userName" style="color: #00ffcc;">نەدیار</strong><br>
-                <span id="userStatus" style="font-size: 0.8rem; color: #aaa;">ئەکاونتا تەلەگرام یەکانگیرە ✅</span>
+                <span style="font-size: 0.8rem; color: #aaa;">ئەکاونتا تەلەگرام یەکانگیرە ✅</span>
             </div>
         </div>
 
@@ -158,7 +158,6 @@
             }
 
             try {
-                // ڤەکۆلینا تەلەگرام بۆ دیتنا وێنە و ناڤێ بەکارهێنەری
                 let response = await fetch(`https://api.telegram.org/bot${botToken}/getChat?chat_id=${userId}`);
                 let data = await response.json();
 
@@ -166,11 +165,10 @@
                     let chat = data.result;
                     document.getElementById('userName').innerText = chat.first_name + (chat.username ? ` (@${chat.username})` : '');
                     
-                    // ئینانا وێنەیێ پڕۆفایلی یێ تەلەگرام
                     let photoRes = await fetch(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos?user_id=${userId}&limit=1`);
                     let photoData = await photoRes.json();
                     
-                    let avatarUrl = "https://via.placeholder.com/50"; // وێنەیێ دەستپێکێ ئەگەر نەبیت
+                    let avatarUrl = "https://via.placeholder.com/50";
                     if (photoData.ok && photoData.result.total_count > 0) {
                         let fileId = photoData.result.photos[0][0].file_id;
                         let fileRes = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
@@ -202,14 +200,30 @@
                 return;
             }
 
-            // هنارتنا داخوازیێ بۆ سێرڤەری دا باڵانس بهێتە زێدەکرن
             alertMsg.style.display = 'block';
             alertMsg.style.color = '#00ffcc';
-            alertMsg.innerText = "⏳ ل هافێن هنارتنێ... کاتژمێرەکێ چاڤەڕێ بە.";
+            alertMsg.innerText = "⏳ ل هافێن هنارتنێ... چاڤەڕێ بە.";
 
-            setTimeout(() => {
-                alertMsg.innerText = `🎉 ب سەرکەفتن! ${amount} کلیل بۆ ئەکاونتا (${userId}) هاتنە زێدەکرن.`;
-            }, 1000);
+            try {
+                // لێرە لینکا سێرڤەرێ خوە (یا Railway) دانە
+                let response = await fetch('https://لێرە-لینکا-سێرڤەرا-خوە-دانە.up.railway.app/api/add_balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, amount: amount })
+                });
+                
+                let result = await response.json();
+                if (result.status === "success") {
+                    alertMsg.style.color = '#00ffcc';
+                    alertMsg.innerText = `🎉 ب سەرکەفتن! ${amount} کلیل زێدەبوون. باڵانسا نوو: ${result.new_balance}`;
+                } else {
+                    alertMsg.style.color = '#ff4d4d';
+                    alertMsg.innerText = "⚠️ خەلەتیەک هشک بوتە!";
+                }
+            } catch (error) {
+                alertMsg.style.color = '#ff4d4d';
+                alertMsg.innerText = "⚠️ پەیوەندی ب سێرڤەری نەکەت! لینکا سێرڤەری پشکنە.";
+            }
         }
     </script>
 </body>
